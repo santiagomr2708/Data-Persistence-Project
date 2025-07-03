@@ -11,6 +11,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text BestScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -36,6 +37,12 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        // Mostrar los datos del jugador que hizo el récord
+        string bestPlayer = PlayerPrefs.GetString("BestPlayer", "None");
+        int bestScore = PlayerPrefs.GetInt("BestScore", 0);
+
+        BestScoreText.text = $"Best Score : {bestPlayer} : {bestScore}";
     }
 
     private void Update()
@@ -59,6 +66,10 @@ public class MainManager : MonoBehaviour
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                SceneManager.LoadScene("Menu"); // vuelve al menú principal
+            }
         }
     }
 
@@ -72,5 +83,16 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        int storedBest = PlayerPrefs.GetInt("BestScore", 0);
+
+        // Si el puntaje actual supera el guardado, lo actualizamos
+        if (m_Points > storedBest)
+        {
+            PlayerPrefs.SetInt("BestScore", m_Points);
+            PlayerPrefs.SetString("BestPlayer", DataManager.Instance.playerName);
+            PlayerPrefs.Save();
+        }
     }
+
 }
